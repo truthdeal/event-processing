@@ -1,1 +1,4 @@
-org/example/Main.class
+org\example\EsperFactory.class
+org\example\RabbitMQ_Factory.class
+org\example\Main.class
+org\example\PersonEvent.class
