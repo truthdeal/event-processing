@@ -1,8 +1,8 @@
 package org.example;
 
-public class EventE extends PersonEvent {
+public class EventE extends BaseEvent {
 
-    public EventE(String name, int age) {
-        super(name, age);
+    public EventE() {
+        EventType = EventTypes.E;
     }
 }

@@ -21,12 +21,30 @@ public class Main {
     public static EsperFactory esperFactory;
     public static void main(String[] args) throws IOException, TimeoutException {
 
-        String queueName = "PersonEvents";
-        String message = "{\"name\": \"Nicolas Steffin\", \"age\": 26}";
+        String queueName = "EventAQueue";
+        String message = "{\"EventType\": \"0\", \"Message\": Event A Message}";
 
         //rabbitmq setup
         RabbitMQ_Factory rabbitMQ_factory = new RabbitMQ_Factory("localhost");
         rabbitMQ_factory.CreateQueue(queueName);
+
+
+        //esper setup
+        esperFactory = new EsperFactory();
+        esperFactory.Init();
+        esperFactory.AddEventType(EventA.class);
+        esperFactory.AddEventType(EventB.class);
+        esperFactory.AddEventType(EventC.class);
+        esperFactory.AddEventType(EventD.class);
+        esperFactory.AddEventType(EventE.class);
+        esperFactory.AddEventType(EventF.class);
+
+
+        //rabbitmq publish message
+        rabbitMQ_factory.BasicPublish(queueName, message);
+
+
+        //setup for a callback that gets called when the consumer consumes a message
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String body = new String(delivery.getBody(), "UTF-8");
             System.out.println("Received message: " + body);
@@ -35,30 +53,21 @@ public class Main {
             evaluateQuery(body);
         };
 
-        //esper setup
-        esperFactory = new EsperFactory();
-        esperFactory.Init();
-        esperFactory.AddEventType(PersonEvent.class);
-
-        //rabbitmq publish message
-        rabbitMQ_factory.BasicPublish(queueName, message);
-
 
         //rabbitmq consume message
         RabbitMQConsumer consumer = new RabbitMQConsumer();
         consumer.consumeMessages(queueName, deliverCallback);
-
-
     }
 
 
     private static void evaluateQuery(String message) {
 
-        PersonEvent personEvent;
+        BaseEvent event;
         try {
             //parse message string into event class
             ObjectMapper objectMapper = new ObjectMapper();
-            personEvent = objectMapper.readValue(message, PersonEvent.class);
+
+            event = objectMapper.readValue(message, BaseEvent.class);
 
             //configure filtering
             //ex:
@@ -67,7 +76,7 @@ public class Main {
             EPEventService eventService = esperFactory.DeployingQuery("PersonStatement", "select name, age from PersonEvent(age>=25)");
 
             System.out.println("sending event bean:");
-            eventService.sendEventBean(personEvent, "PersonEvent");
+            eventService.sendEventBean(event, "PersonEvent");
         } catch (JsonProcessingException | EPCompileException | EPDeployException e) {
             System.out.println(e.getMessage());
         }
