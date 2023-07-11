@@ -1,4 +1,4 @@
-package org.example;
+package base.esper;
 import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.common.client.configuration.Configuration;
 import com.espertech.esper.compiler.client.CompilerArguments;
@@ -10,7 +10,7 @@ import com.espertech.esper.runtime.client.*;
 public class EsperFactory {
     EPCompiler compiler;
     Configuration configuration;
-    public void  Init() {
+    public  EsperFactory() {
         compiler = EPCompilerProvider.getCompiler();
         configuration = new Configuration();
     }
@@ -20,7 +20,7 @@ public class EsperFactory {
     }
 
     //ex. parameter "@name('my-statement') select name, age from PersonEvent"
-    public EPEventService DeployingQuery(String statementName, String query ) throws EPCompileException, EPDeployException {
+    public EPEventService DeployingQuery(String statementName, String query, UpdateListener updateListener ) throws EPCompileException, EPDeployException {
         CompilerArguments args = new CompilerArguments(configuration);
         EPCompiled epCompiled;
 
@@ -34,11 +34,7 @@ public class EsperFactory {
         deployment = runtime.getDeploymentService().deploy(epCompiled);
 
         EPStatement statement = runtime.getDeploymentService().getStatement(deployment.getDeploymentId(), statementName);
-        statement.addListener( (newData, oldData, _statement, _runtime) -> {
-            String name = (String) newData[0].get("name");
-            int age = (int) newData[0].get("age");
-            System.out.println(String.format("%s::: Name:%s, Age: %d", statementName, name, age));
-        });
+        statement.addListener( updateListener);
 
         return runtime.getEventService();
     }

@@ -1,4 +1,4 @@
-package org.example;
+package base.events;
 
 public class EventC extends BaseEvent {
 
