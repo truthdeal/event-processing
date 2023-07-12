@@ -21,7 +21,8 @@ public class RabbitMQConsumer {
             channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("consumeMessages: " + queueName);
         }
     }
 

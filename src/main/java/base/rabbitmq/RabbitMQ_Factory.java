@@ -19,6 +19,7 @@ public class RabbitMQ_Factory {
             //channel.basicPublish("", queueName, null, message.getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -27,6 +28,7 @@ public class RabbitMQ_Factory {
              Channel channel = connection.createChannel()) {
             channel.basicPublish("", queueName, null, message.getBytes("UTF-8"));
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }

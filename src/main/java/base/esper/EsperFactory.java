@@ -11,15 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EsperFactory {
-    EPCompiler compiler;
-    Configuration configuration;
-    EPRuntime runtime;
+    public static EPCompiler compiler;
+    public static Configuration configuration;
+    public static EPRuntime runtime;
 
-    Map<String, EPStatement> statements = new HashMap<String, EPStatement>();
-    Map<String, EPDeployment> deployments = new HashMap<String, EPDeployment>();
+    public Map<String, EPStatement> statements = new HashMap<String, EPStatement>();
+    public Map<String, EPDeployment> deployments = new HashMap<String, EPDeployment>();
     public  EsperFactory() {
         compiler = EPCompilerProvider.getCompiler();
         configuration = new Configuration();
+
     }
 
     public void AddEventType(Class eventType) {
@@ -32,6 +33,8 @@ public class EsperFactory {
         CompilerArguments args = new CompilerArguments(configuration);
         EPCompiled epCompiled;
 
+        //query = "SELECT * FROM BaseEvent WHERE eventType='E'";
+        //query = "SELECT * FROM pattern [every (event1=BaseEvent(eventType = 'A') -> event2=BaseEvent(eventType = 'B'))]";
         query = String.format("@name('%s') %s", statementName, query);
 
         epCompiled = compiler.compile(query, args);
@@ -40,13 +43,19 @@ public class EsperFactory {
         runtime = EPRuntimeProvider.getDefaultRuntime(configuration);
         EPDeployment deployment;
 
-        deployment = runtime.getDeploymentService().deploy(epCompiled);
+        EPDeploymentService deploymentService = runtime.getDeploymentService();
+        deployment = deploymentService.deploy(epCompiled);
         deployments.put(statementName, deployment);
 
-        EPStatement statement = runtime.getDeploymentService().getStatement(deployment.getDeploymentId(), statementName);
-        statement.addListener( updateListener);
-        statements.put(statementName, statement);
+        EPStatement statement = deploymentService.getStatement(deployment.getDeploymentId(), statementName);
 
+        if(statement == null){
+            System.out.println(statementName + " is null");
+        }
+        else {
+            statement.addListener(updateListener);
+            statements.put(statementName, statement);
+        }
         return runtime.getEventService();
     }
 }

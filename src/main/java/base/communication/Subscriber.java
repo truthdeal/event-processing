@@ -10,11 +10,9 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Consumer;
 
 import javax.swing.event.DocumentEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Scanner;
 
 public class Subscriber {
     public static void main(String[] args) throws JsonProcessingException, InterruptedException, EPDeployException, EPCompileException {
@@ -24,7 +22,7 @@ public class Subscriber {
 
         String query = "";
 
-        List<Integer> targetNodeIds = new ArrayList<Integer>();
+        Set<Integer> targetNodeIds = new HashSet<Integer>();
 
         String url = "localhost";
 
@@ -48,8 +46,9 @@ public class Subscriber {
 
         for(int id : targetNodeIds){
             try {
-                node.Subscribe(id, query, "exampleStatement");
+                node.Subscribe(id, query, "sub"+id);
             } catch (EPDeployException | EPCompileException e) {
+                System.out.println(e.getMessage());
                 throw new RuntimeException(e);
             }
         }
@@ -76,37 +75,43 @@ public class Subscriber {
         eventE.EventType = "E";
         eventE.Message = "EventE message";
 
-        events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
+        BaseEvent eventF = new BaseEvent();
+        eventF.EventType = "F";
+        eventF.Message = "EventF message";
 
-        events.add(eventE);
-        events.add(eventC);
-        events.add(eventD);
-
-        events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
+        CreateEventQueue(events, eventA, eventB, eventC, eventE, eventD, eventF);
+        CreateEventQueue(events, eventA, eventA, eventA, eventA, eventA, eventA);
 
 
-        node.Subscribe(5, query, "exampleStatement");
+        //node.Subscribe(5, query, "exampleStatement");
             //node.consumeMessages("queue" + 5);
-        for(BaseEvent event : events){
-            Node tempNode = new Node(5, url);
-            tempNode.Publish(event);
-            Thread.sleep(100);
+        for(int id : targetNodeIds) {
+            for (BaseEvent event : events) {
+                Node tempNode = new Node(id, url);
+                event.NodeId = id;
+                tempNode.Publish(event);
+                Thread.sleep(100);
+            }
         }
-
-        node.Unsubscribe("exampleStatement");
+        for(int id : targetNodeIds) {
+            //node.Unsubscribe("sub"+id);
+        }
     }
 
-    public static List<Integer> extractNodeIds(String query) {
-        List<Integer> nodeIds = new ArrayList<>();
+    private static void CreateEventQueue(List<BaseEvent> events, BaseEvent eventA, BaseEvent eventB, BaseEvent eventC, BaseEvent eventD, BaseEvent eventE, BaseEvent eventF) {
+        events.add(eventA);
+        events.add(eventA);
+        events.add(eventA);
+
+        events.add(eventB);
+        events.add(eventC);
+        events.add(eventE);
+        events.add(eventD);
+        events.add(eventF);
+    }
+
+    public static Set<Integer> extractNodeIds(String query) {
+        Set<Integer> nodeIds = new HashSet<Integer>();
         Pattern pattern = Pattern.compile("\\b\\d+\\b");
         Matcher matcher = pattern.matcher(query);
 
