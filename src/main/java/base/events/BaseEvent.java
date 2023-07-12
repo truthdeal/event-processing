@@ -3,11 +3,16 @@ package base.events;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BaseEvent {
-    public static enum EventTypes{A,B,C,D,E,F}
-
     @JsonProperty("EventType")
-    public EventTypes EventType;
+    public String EventType;
 
     @JsonProperty("Message")
     public String Message;
+
+    public String getEventType() {
+        return EventType;
+    }
+    public String getMessage() {
+        return Message;
+    }
 }

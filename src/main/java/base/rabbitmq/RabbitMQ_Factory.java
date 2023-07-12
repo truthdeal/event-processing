@@ -37,21 +37,4 @@ public class RabbitMQ_Factory {
 
         return new DefaultConsumer(channel);
     }
-    public void BasicConsume(Consumer consumer, String queueName){
-        String message = "";
-        try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
-            DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                String _message = new String(delivery.getBody(), "UTF-8");
-                System.out.println("Message: " + _message);
-                System.out.println("Consumer tag: " + consumerTag);
-            };
-
-            channel.basicConsume(queueName, true, consumer);
-            //message = channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

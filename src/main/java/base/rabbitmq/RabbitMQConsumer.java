@@ -5,6 +5,8 @@ import com.rabbitmq.client.*;
 public class RabbitMQConsumer {
     private final ConnectionFactory factory;
 
+    public DeliverCallback rabbitMQ_DeliverCallback;
+
     public RabbitMQConsumer() {
         factory = new ConnectionFactory();
         factory.setHost("localhost"); // Set the RabbitMQ server hostname
