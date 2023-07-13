@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PubSub App" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="base.communication.Subscriber" />
+    <module name="PubSub" />
+    <option name="PROGRAM_PARAMETERS" value="-n 2 -u localhost -s &quot;6,7&quot;" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
