@@ -41,7 +41,7 @@ public class Subscriber {
         System.out.println("URL: " + url);
 
         Node[] nodes = InitNodes();
-        Node contactedNode = nodes[nodeId];
+        Node contactedNode = nodes[nodeId-1];
 
         for(int id : subscribedNodeIds){
             try {
@@ -55,15 +55,15 @@ public class Subscriber {
 
         BaseEvent eventA = new BaseEvent();
         eventA.EventType = "A";
-        eventA.Message = "EventA message";
+        eventA.Message = "1";
 
         BaseEvent eventB = new BaseEvent();
         eventB.EventType = "B";
-        eventB.Message = "EventB message";
+        eventB.Message = "B";
 
         BaseEvent eventC = new BaseEvent();
         eventC.EventType = "C";
-        eventC.Message = "EventC message";
+        eventC.Message = "C";
 
         BaseEvent eventD = new BaseEvent();
         eventD.EventType = "D";
@@ -85,23 +85,22 @@ public class Subscriber {
         CreateEventQueue(allEvents, eventA, eventB, eventC, eventD, eventE,eventF);
 
         while(true) {
-            int randId =  new Random().nextInt(9 - 1) + 1;
-            int randEvent = new Random().nextInt(6 - 1) + 1;
+            int randPublishNodeId =  new Random().nextInt(8);
+            int randTargetNodeId = new Random().nextInt(8) + 1;
+            int randEvent = new Random().nextInt(5) ;
 
-            Node publishingNode = nodes[randId];
+            Node publishingNode = nodes[randPublishNodeId];
             BaseEvent pubEvent = allEvents.get(randEvent);
-            pubEvent.NodeId = publishingNode.ID;
+            pubEvent.NodeId = randTargetNodeId;
+            pubEvent.Message = "" + randPublishNodeId;
             publishingNode.Publish(pubEvent);
 
-            Thread.sleep(1000%17);
+            Thread.sleep(500%17);
         }
     }
 
     private static void CreateEventQueue(List<BaseEvent> events, BaseEvent eventA, BaseEvent eventB, BaseEvent eventC, BaseEvent eventD, BaseEvent eventE, BaseEvent eventF) {
         events.add(eventA);
-        events.add(eventA);
-        events.add(eventA);
-
         events.add(eventB);
         events.add(eventC);
         events.add(eventE);

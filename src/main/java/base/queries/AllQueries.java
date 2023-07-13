@@ -10,12 +10,13 @@ public class AllQueries {
             new int[]{5,9},
             new String[]{"eventB", "eventC", "eventD", "eventE", "eventF"});
     public static final QueryContainer QUERY_2 = new QueryContainer(
-            "SELECT * FROM BaseEvent WHERE eventType='E' AND nodeId IN (1)",
+            "SELECT * FROM BaseEvent WHERE eventType='D' AND (message='2' OR nodeId IN (6,7))",
+            //"SELECT * FROM BaseEvent WHERE eventType='E' AND nodeId IN (1)",
             new int[]{1},
             new String[0]
     );
     public static final QueryContainer QUERY_3 = new QueryContainer(
-            "SELECT * FROM pattern [every((eventA=BaseEvent(eventType = 'A')) -> eventF=BaseEvent(eventType = 'F'))] WHERE (eventA.nodeId IN (2,3) AND eventF.nodeId IN (2,3))",
+            "SELECT * FROM pattern [every(eventA=BaseEvent(eventType = 'A') -> eventF=BaseEvent(eventType = 'F'))] WHERE (eventA.nodeId IN (2,3) AND eventF.nodeId IN (2,3))",
             new int[]{2,3},
             new String[]{"eventA", "eventF"});
     public static final QueryContainer QUERY_4 = new QueryContainer(
@@ -30,14 +31,14 @@ public class AllQueries {
             new String[]{"eventA", "eventC", "eventD", "eventE", "eventF"}
     );
     public static final QueryContainer QUERY_6 = new QueryContainer(
-            "SELECT * FROM BaseEvent WHERE eventType='C' AND nodeId IN (9)",
-            new int[]{9},
-            new String[0]
+            "SELECT * FROM pattern [every( eventA = BaseEvent(eventType='E') -> eventC= BaseEvent(eventType='D'))]",
+            new int[]{6},
+            new String[]{"eventA", "eventC"}
     );
 
     public static final QueryContainer QUERY_7 = new QueryContainer(
-            "SELECT * FROM BaseEvent WHERE eventType='F' AND nodeId IN (7)",
-            new int[]{7},
+            "SELECT * FROM BaseEvent WHERE ( eventType='F' AND message='7' AND nodeId IN (2,6,7))",
+            new int[]{2,6,7},
             new String[0]
     );
 

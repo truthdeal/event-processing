@@ -65,23 +65,23 @@ public class Node implements Runnable{
             //pass filterQuery to Esper by creating an EPEventService that gets stored in the map
             UpdateListener updateListener = (newData, oldData, _statement, _runtime) -> {
 
-                String returnMessage = String.format("ESPER %s", statementName);
+                String returnMessage = String.format("SUB %s", statementName);
 
                 try {
                     if(queryContainer.EventFilters.length > 0) {
                         for (String eventName : queryContainer.EventFilters) {
-                            returnMessage += "EventType: " + newData[0].get(eventName + ".eventType").toString();
-                            returnMessage += "NodeId: " + (int) newData[0].get(eventName + ".nodeId");
-                            returnMessage += "TimeStamp: " + ((LocalDateTime) newData[0].get(eventName + ".timeStamp")).toString();
+                            returnMessage += " EventType: " + newData[0].get(eventName + ".eventType").toString();
+                            returnMessage += " NodeId: " + (int) newData[0].get(eventName + ".nodeId");
+                            returnMessage += " TimeStamp: " + ((LocalDateTime) newData[0].get(eventName + ".timeStamp")).toString();
 
                             System.out.println(returnMessage);
                             returnMessage = "";
                         }
                     } else{
-                        returnMessage += "EventType: " + newData[0].get("eventType").toString();
-                        returnMessage += "Message: " + newData[0].get("message").toString();
-                        returnMessage += "NodeId: " + (int) newData[0].get("nodeId");
-                        returnMessage += "TimeStamp: " + ((LocalDateTime) newData[0].get("timeStamp")).toString();
+                        returnMessage += " EventType: " + newData[0].get("eventType").toString();
+                        returnMessage += " Message: " + newData[0].get("message").toString();
+                        returnMessage += " NodeId: " + (int) newData[0].get("nodeId");
+                        returnMessage += " TimeStamp: " + newData[0].get("timeStamp");
 
                         System.out.println(returnMessage);
                     }
@@ -155,30 +155,8 @@ public class Node implements Runnable{
     }
 
     public BaseEvent ParseMessageToBaseEvent(String message) throws JsonProcessingException {
-        BaseEvent event;
-
         ObjectMapper objectMapper = new ObjectMapper();
-
-        JsonNode jsonNode = objectMapper.readTree(message);
-        int eventTypeId = jsonNode.get("EventType").asInt();
-        switch(eventTypeId){
-            case 0:
-                event = objectMapper.readValue(message, EventA.class);
-            case 1:
-                event = objectMapper.readValue(message, EventB.class);
-            case 2:
-                event = objectMapper.readValue(message, EventC.class);
-            case 3:
-                event = objectMapper.readValue(message, EventD.class);
-            case 4:
-                event = objectMapper.readValue(message, EventE.class);
-            case 5:
-                event = objectMapper.readValue(message, EventF.class);
-            default:
-                event = objectMapper.readValue(message, EventA.class);
-        }
-
-        return event;
+        return objectMapper.readValue(message, BaseEvent.class);
     }
 
     private void PublishFilteredData(EventBean eventBean, String eventName){
@@ -197,7 +175,7 @@ public class Node implements Runnable{
         String body = null;
         try {
             body = objectMapper.writeValueAsString(filteredEvent);
-            System.out.println("PUB:" + body);
+            System.out.println("PUB " + QueueName + ":" + body);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
