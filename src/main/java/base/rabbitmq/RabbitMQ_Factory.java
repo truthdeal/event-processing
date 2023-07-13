@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQ_Factory {
-    ConnectionFactory factory;
-    public RabbitMQ_Factory(String url){
+    public final ConnectionFactory factory;
+    public RabbitMQ_Factory(String url, int port){
         factory = new ConnectionFactory();
         factory.setHost(url);
+        factory.setPort(port);
     }
     public void CreateQueue(String queueName){
         try (Connection connection = factory.newConnection();

@@ -6,7 +6,7 @@ public class Publisher {
 
 
     public void Publish(int nodeId, String url){
-        Node node = new Node(nodeId, url);
+
 
     }
 

@@ -7,9 +7,8 @@ public class RabbitMQConsumer {
 
     public DeliverCallback rabbitMQ_DeliverCallback;
 
-    public RabbitMQConsumer() {
-        factory = new ConnectionFactory();
-        factory.setHost("localhost"); // Set the RabbitMQ server hostname
+    public RabbitMQConsumer(ConnectionFactory _factory) {
+        factory = _factory;
     }
 
     String Message = "";

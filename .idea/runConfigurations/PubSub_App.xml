@@ -2,7 +2,7 @@
   <configuration default="false" name="PubSub App" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="base.communication.Subscriber" />
     <module name="PubSub" />
-    <option name="PROGRAM_PARAMETERS" value="-n 2 -q &quot;SELECT * FROM pattern [every (eventB = BaseEvent(eventType='B') -&gt; (eventC= BaseEvent(eventType='C') AND eventE=BaseEvent(eventType='E') AND eventD=BaseEvent(eventType='D') AND eventF=BaseEvent(eventType='F')))]  WHERE (eventB.nodeId IN (5, 9) AND eventC.nodeId IN (5,9) AND eventE.nodeId IN (5, 9) AND eventD.nodeId IN (5,9) AND eventF.nodeId IN (5,9))&quot; -u localhost" />
+    <option name="PROGRAM_PARAMETERS" value="-n 2 -q &quot;SELECT * FROM pattern [every (eventB = BaseEvent(eventType='B') -&gt; (eventC= BaseEvent(eventType='C') AND eventE=BaseEvent(eventType='E') AND eventD=BaseEvent(eventType='D') AND eventF=BaseEvent(eventType='F')))]  WHERE (eventB.nodeId IN (5, 9) AND eventC.nodeId IN (5,9) AND eventE.nodeId IN (5, 9) AND eventD.nodeId IN (5,9) AND eventF.nodeId IN (5,9))&quot; -u localhost -s &quot;1,3,5&quot;" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

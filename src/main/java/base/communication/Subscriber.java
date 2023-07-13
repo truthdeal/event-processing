@@ -2,14 +2,11 @@ package base.communication;
 
 import base.backend.Node;
 import base.events.*;
-import base.rabbitmq.RabbitMQConsumer;
+import base.queries.AllQueries;
 import com.espertech.esper.compiler.client.EPCompileException;
 import com.espertech.esper.runtime.client.EPDeployException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Consumer;
 
-import javax.swing.event.DocumentEvent;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +19,7 @@ public class Subscriber {
 
         String query = "";
 
-        Set<Integer> targetNodeIds = new HashSet<Integer>();
+        Set<Integer> subscribedNodeIds = new HashSet<Integer>();
 
         String url = "localhost";
 
@@ -34,6 +31,8 @@ public class Subscriber {
                     query = args[i+1];
                 case "-u":
                     url = args[i+1];
+                case "-s":
+                    subscribedNodeIds = extractNodeIds(args[i+1]);
             }
         }
 
@@ -41,15 +40,14 @@ public class Subscriber {
         System.out.println("Query: " + query);
         System.out.println("URL: " + url);
 
-        node = new Node(nodeId, url);
-        targetNodeIds = extractNodeIds(query);
+        Node[] nodes = InitNodes();
+        Node contactedNode = nodes[nodeId];
 
-        for(int id : targetNodeIds){
+        for(int id : subscribedNodeIds){
             try {
-                node.Subscribe(id, query, "sub"+id);
+                contactedNode.Subscribe(id, Node.STATEMENT_BASE_NAME+id);
             } catch (EPDeployException | EPCompileException e) {
                 System.out.println(e.getMessage());
-                throw new RuntimeException(e);
             }
         }
 
@@ -83,18 +81,17 @@ public class Subscriber {
         CreateEventQueue(events, eventA, eventA, eventA, eventA, eventA, eventA);
 
 
-        //node.Subscribe(5, query, "exampleStatement");
-            //node.consumeMessages("queue" + 5);
-        for(int id : targetNodeIds) {
-            for (BaseEvent event : events) {
-                Node tempNode = new Node(id, url);
-                event.NodeId = id;
-                tempNode.Publish(event);
-                Thread.sleep(100);
-            }
-        }
-        for(int id : targetNodeIds) {
-            //node.Unsubscribe("sub"+id);
+        List<BaseEvent> allEvents = new ArrayList<BaseEvent>();
+        CreateEventQueue(allEvents, eventA, eventB, eventC, eventD, eventE,eventF);
+
+        while(true) {
+            int randId =  new Random().nextInt(9 - 1) + 1;
+            int randEvent = new Random().nextInt(6 - 1) + 1;
+
+            Node publishingNode = nodes[randId];
+            publishingNode.Publish(allEvents.get(randEvent));
+
+            Thread.sleep(100);
         }
     }
 
@@ -108,6 +105,15 @@ public class Subscriber {
         events.add(eventE);
         events.add(eventD);
         events.add(eventF);
+    }
+
+    private static Node[] InitNodes(){
+        Node[] nodes = new Node[9];
+        for(int i = 0; i< 9; i++){
+            nodes[i] = new Node(i+1,"localhost", 5672+i,  AllQueries.QUERY_CONTAINERS[i]);
+        }
+
+        return nodes;
     }
 
     public static Set<Integer> extractNodeIds(String query) {
