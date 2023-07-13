@@ -10,14 +10,13 @@ public class RabbitMQ_Factory {
     public RabbitMQ_Factory(String url, int port){
         factory = new ConnectionFactory();
         factory.setHost(url);
-        factory.setPort(port);
+        //factory.setPort(port);
     }
     public void CreateQueue(String queueName){
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
             channel.queueDeclare(queueName, false, false, false, null);
-            String message = "Init queue";
-            //channel.basicPublish("", queueName, null, message.getBytes("UTF-8"));
+            //channel.basicPublish("", queueName, null, "init message".getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

@@ -44,6 +44,10 @@ public class Node implements Runnable{
         this.queryContainer = queryContainer;
         //rabbitmq setup
         rabbitMQFactory = new RabbitMQ_Factory(url, port);
+
+        rabbitMQFactory.CreateQueue(QueueName);
+
+
         //esper setup
         esperFactory = new EsperFactory();
         esperFactory.AddEventType(BaseEvent.class);
@@ -97,10 +101,10 @@ public class Node implements Runnable{
             DeliverCallback rabbitMQ_DeliverCallback = (consumerTag, delivery) -> {
                 String body = new String(delivery.getBody(), "UTF-8");
 
-                System.out.println("RabbitMQ: " + body);
+                //System.out.println("RabbitMQ: " + body);
 
                 BaseEvent event = ParseMessageToBaseEvent(body);
-                event.TimeStamp = LocalDateTime.now();
+                event.TimeStamp = LocalDateTime.now().toString();
 
                 this.ForwardEventToEsper(event, statementName);
             };
@@ -125,22 +129,20 @@ public class Node implements Runnable{
     public void Publish(BaseEvent event) throws JsonProcessingException {
 
         UpdateListener updateListener = (newData, oldData, _statement, _runtime) -> {
-            try {
-                if(queryContainer.EventFilters.length > 0) {
-                    for (String eventName : queryContainer.EventFilters) {
+            if(queryContainer.EventFilters.length > 0) {
+                for (String eventName : queryContainer.EventFilters) {
 
-                        PublishFilteredData(newData[0], eventName);
-                    }
-                } else{
-                    PublishFilteredData(newData[0], "");
+                    PublishFilteredData(newData[0], eventName);
                 }
-            }catch(Exception e){
-                System.out.println(e.getMessage());
+            } else{
+                PublishFilteredData(newData[0], "");
             }
         };
 
         try {
-            epEventServices.put(STATEMENT_NAME, esperFactory.DeployingQuery(STATEMENT_NAME, queryContainer.Query, updateListener));
+            String statementName = STATEMENT_NAME+"_pub_"+ID;
+            epEventServices.put(statementName, esperFactory.DeployingQuery(STATEMENT_NAME, queryContainer.Query, updateListener));
+            epEventServices.get(statementName).sendEventBean(event, "BaseEvent");
         } catch (EPCompileException|EPDeployException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e);
@@ -148,16 +150,11 @@ public class Node implements Runnable{
     }
 
     public void ForwardEventToEsper(BaseEvent event, String statementName) {
-        //get epEventService
-        EPStatement statement = esperFactory.statements.get(statementName);
-
         EPEventService eventService =epEventServices.get(statementName);
         eventService.sendEventBean(event, "BaseEvent");
     }
 
     public BaseEvent ParseMessageToBaseEvent(String message) throws JsonProcessingException {
-        //parse message string into event class
-
         BaseEvent event;
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -193,17 +190,17 @@ public class Node implements Runnable{
         filteredEvent.EventType = eventBean.get(eventName + "eventType").toString();
         filteredEvent.NodeId = (int) eventBean.get(eventName + "nodeId");
         filteredEvent.Message = eventBean.get(eventName + "message").toString();
-        filteredEvent.TimeStamp = (LocalDateTime) eventBean.get(eventName + "timeStamp");
+        filteredEvent.TimeStamp = eventBean.get(eventName + "timeStamp").toString();
 
 
         ObjectMapper objectMapper = new ObjectMapper();
         String body = null;
         try {
             body = objectMapper.writeValueAsString(filteredEvent);
+            System.out.println("PUB:" + body);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
         rabbitMQFactory.CreateQueue(QueueName);
         rabbitMQFactory.BasicPublish(QueueName, body);
     }

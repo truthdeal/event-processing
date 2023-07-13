@@ -15,11 +15,11 @@ public class AllQueries {
             new String[0]
     );
     public static final QueryContainer QUERY_3 = new QueryContainer(
-            "SELECT * FROM pattern [every((event1=BaseEvent(eventType = 'A')) -> event2=BaseEvent(eventType = 'F'))] WHERE (event1.nodeId IN (2,3) AND event2.nodeId IN (2,3))",
+            "SELECT * FROM pattern [every((eventA=BaseEvent(eventType = 'A')) -> eventF=BaseEvent(eventType = 'F'))] WHERE (eventA.nodeId IN (2,3) AND eventF.nodeId IN (2,3))",
             new int[]{2,3},
             new String[]{"eventA", "eventF"});
     public static final QueryContainer QUERY_4 = new QueryContainer(
-            "SELECT * FROM pattern [every((event1=BaseEvent(eventType = 'B')) -> event2=BaseEvent(eventType = 'A'))] WHERE (event1.nodeId IN (5,9) AND event2.nodeId IN (5,9))",
+            "SELECT * FROM pattern [every((eventB=BaseEvent(eventType = 'B')) -> eventA=BaseEvent(eventType = 'A'))] WHERE (eventB.nodeId IN (5,9) AND eventA.nodeId IN (5,9))",
             new int[]{5,9},
             new String[]{"eventB", "eventA"}
     );

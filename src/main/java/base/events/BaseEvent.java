@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 
 public class BaseEvent {
     @JsonProperty("EventType")
-    public String EventType;
+    public String EventType = "";
 
     @JsonProperty("Message")
-    public String Message;
+    public String Message = "";
 
     @JsonProperty("NodeId")
-    public int NodeId;
+    public int NodeId = 0;
 
     @JsonProperty("TimeStamp")
-    public LocalDateTime TimeStamp;
+    public String TimeStamp = "";
 
     @JsonIgnore
     public String getEventType() { return EventType; }
@@ -26,5 +26,5 @@ public class BaseEvent {
     @JsonIgnore
     public int getNodeId() {return NodeId;    }
     @JsonIgnore
-    public LocalDateTime getTimeStamp(){return TimeStamp;}
+    public String getTimeStamp(){return TimeStamp;}
 }

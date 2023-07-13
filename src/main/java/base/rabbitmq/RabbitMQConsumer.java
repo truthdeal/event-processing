@@ -2,6 +2,9 @@ package base.rabbitmq;
 
 import com.rabbitmq.client.*;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 public class RabbitMQConsumer {
     private final ConnectionFactory factory;
 
@@ -19,8 +22,8 @@ public class RabbitMQConsumer {
 
             channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
             });
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (IOException | TimeoutException e) {
+            System.out.println(e);
             System.out.println("consumeMessages: " + queueName);
         }
     }

@@ -89,9 +89,11 @@ public class Subscriber {
             int randEvent = new Random().nextInt(6 - 1) + 1;
 
             Node publishingNode = nodes[randId];
-            publishingNode.Publish(allEvents.get(randEvent));
+            BaseEvent pubEvent = allEvents.get(randEvent);
+            pubEvent.NodeId = publishingNode.ID;
+            publishingNode.Publish(pubEvent);
 
-            Thread.sleep(100);
+            Thread.sleep(1000%17);
         }
     }
 
